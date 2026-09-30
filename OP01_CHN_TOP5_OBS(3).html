@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>One Piece TOP 5 — OBS Overlay</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent!important;font-family:Arial,Helvetica,sans-serif;color:#fff}
+body{background:transparent}
+.stage{position:relative;width:100vw;height:100vh;background:transparent}
+.header{position:absolute;top:1.2%;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:7px;padding:6px 8px;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:rgba(8,9,14,.78);backdrop-filter:blur(10px);white-space:nowrap;z-index:20}
+.header .box{font-size:10px;font-weight:950;letter-spacing:.35px}
+.header .prices{font-size:8px;opacity:.58;font-weight:800}
+.sets{position:absolute;top:6.9%;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:21}
+.sets button{font:900 9px Arial;border:1px solid rgba(255,255,255,.16);color:#fff;background:rgba(7,8,12,.68);border-radius:999px;padding:5px 8px;cursor:pointer;backdrop-filter:blur(8px)}
+.sets button.active{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.38);box-shadow:0 0 15px rgba(255,255,255,.08)}
+.rank{position:absolute;top:12.5%;left:50%;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;display:grid;place-items:center;text-align:center;background:rgba(8,9,14,.84);border:1.5px solid rgba(255,255,255,.28);box-shadow:0 12px 28px rgba(0,0,0,.4);z-index:10}
+.rank small{display:block;font-size:8px;opacity:.55;font-weight:900}.rank b{display:block;font-size:26px;line-height:.9}
+.cardbox{position:absolute;left:50%;top:38%;width:270px;transform:translate(-50%,-50%);opacity:0;filter:drop-shadow(0 20px 24px rgba(0,0,0,.55));}
+.cardbox.in{animation:in .7s cubic-bezier(.2,.85,.2,1) forwards}.cardbox.out{animation:out .42s ease forwards}
+.card{width:100%;display:block;border-radius:13px;border:1.5px solid rgba(255,255,255,.28);background:rgba(10,10,14,.4);min-height:380px;object-fit:cover}
+.fallback{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;border-radius:13px;background:linear-gradient(145deg,rgba(20,21,30,.96),rgba(8,9,14,.94));border:1px solid rgba(255,255,255,.16)}
+.fallback strong{font-size:20px}.fallback span{font-size:11px;opacity:.55;margin-top:6px}
+.shine{position:absolute;inset:0;border-radius:13px;overflow:hidden;pointer-events:none}.shine:after{content:"";position:absolute;left:-90%;top:-40%;width:45%;height:180%;transform:rotate(20deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.42),transparent);animation:shine 2.5s ease-in-out infinite}
+.info{position:absolute;left:50%;top:78%;transform:translate(-50%,-50%);width:315px;padding:16px 17px;border-radius:18px;background:linear-gradient(145deg,rgba(10,11,17,.91),rgba(22,23,32,.77));border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(12px);box-shadow:0 18px 40px rgba(0,0,0,.34)}
+.name{font-size:25px;font-weight:950;letter-spacing:-.8px}.sub{margin-top:3px;margin-bottom:10px;font-size:10px;opacity:.58}.pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px}.pill{padding:5px 7px;border-radius:7px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);font-size:8px;font-weight:900}
+.price{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid rgba(255,255,255,.11)}.price span{font-size:9px;font-weight:900;opacity:.64}.price b{font-size:21px}.psa b{font-size:24px}.note{font-size:7.5px;line-height:1.35;opacity:.38;margin-top:8px}
+.progress{position:absolute;bottom:4.1%;left:50%;transform:translateX(-50%);width:285px;height:3px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}.progress i{display:block;width:0;height:100%;background:#fff;box-shadow:0 0 14px rgba(255,255,255,.8)}
+.footer{position:absolute;bottom:1.8%;left:50%;transform:translateX(-50%);font-size:7.5px;letter-spacing:.7px;font-weight:900;opacity:.34;white-space:nowrap}
+.buttons{position:absolute;right:14px;bottom:14px;opacity:.18}.buttons button{color:#fff;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px 9px}
+@keyframes in{from{opacity:0;transform:translate(-50%,-50%) scale(.78) translateY(55px) rotate(-7deg)}60%{opacity:1;transform:translate(-50%,-50%) scale(1.04) translateY(-4px) rotate(1deg)}to{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-1deg)}}
+@keyframes out{from{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-1deg)}to{opacity:0;transform:translate(-50%,-50%) scale(.86) translateY(-30px) rotate(5deg)}}
+@keyframes shine{0%,35%{left:-90%}70%,100%{left:150%}}
+@media(max-width:1000px){.cardbox{width:245px}.info{width:292px}.name{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="header"><span id="emoji">🇨🇳</span><span class="box" id="setName">OP-01 · CAJA CHN</span><span class="prices">· PRECIOS JPN</span></div>
+  <div class="sets">
+    <button id="btnOP01" class="active" onclick="selectSet('OP01')">OP-01</button>
+    <button id="btnOP13" onclick="selectSet('OP13')">OP-13</button>
+    <button id="btnEB03" onclick="selectSet('EB03')">EB-03</button>
+  </div>
+  <div class="rank"><div><small>TOP</small><b id="rank">5</b></div></div>
+  <div class="cardbox" id="cardbox">
+    <img id="card" class="card" alt="">
+    <div id="fallback" class="fallback"><strong id="fallbackTitle">Imagen no disponible</strong><span id="fallbackNumber"></span></div>
+    <div class="shine"></div>
+  </div>
+  <section class="info">
+    <div class="name" id="name"></div>
+    <div class="sub" id="jp"></div>
+    <div class="pills"><span class="pill" id="number"></span><span class="pill" id="rarity"></span><span class="pill">🇯🇵 IMAGEN / PRECIO JPN</span></div>
+    <div class="price"><span>🇯🇵 SIN CALIFICAR</span><b id="raw"></b></div>
+    <div class="price psa"><span>🇯🇵 PSA 10</span><b id="psa"></b></div>
+    <div class="note" id="note"></div>
+  </section>
+  <div class="progress"><i id="bar"></i></div>
+  <div class="footer">FONDO TRANSPARENTE · OVERLAY VERTICAL PARA OBS · 1 / 2 / 3 CAMBIA DE SET</div>
+  <div class="buttons"><button onclick="prev()">◀</button><button onclick="next()">▶</button></div>
+</div>
+<script>
+const USD_EUR = 0.88202; // 1 USD = 0.88202 EUR, 30/09/2026
+const duration = 6500;
+const sets = {
+  OP01:{
+    label:'OP-01 · CAJA CHN', emoji:'🇨🇳',
+    cards:[
+      {rank:5,name:'Roronoa Zoro',jp:'ロロノア・ゾロ',number:'OP01-001',rarity:'L · PARALLEL',image:'https://s3-ap-northeast-1.amazonaws.com/jiraffe-magi/prod/images/item/8179926/1.jpg',raw:45.18,psa:182.19,note:'Referencia JPN · PriceCharting. Importes convertidos a EUR.'},
+      {rank:4,name:'Trafalgar Law',jp:'トラファルガー・ロー',number:'OP01-002',rarity:'L · PARALLEL',image:'https://pixagaming.com/cdn/shop/files/PSA-lawL-front.jpg?v=1767219716&width=1430',raw:70.67,psa:175.00,note:'Referencia JPN · PriceCharting. Importes convertidos a EUR.'},
+      {rank:3,name:'Monkey.D.Luffy',jp:'モンキー・D・ルフィ',number:'OP01-003',rarity:'L · ALT ART',image:'https://boomerangcollectables.com/cdn/shop/files/rn-image_picker_lib_temp_998dc25b-1b18-4f18-bc4e-c4462dc434c6.jpg?v=1751413685',raw:194.88,psa:490.86,note:'Referencia JPN · PriceCharting. Importes convertidos a EUR.'},
+      {rank:2,name:'Nami',jp:'ナミ · MANGA',number:'OP01-016',rarity:'R · MANGA',image:'https://i.ebayimg.com/images/g/JT8AAOSwU4lmo9Z9/s-l1200.jpg',raw:638.28,psa:1087.50,note:'Referencia JPN · Manga/Parallel. Importes convertidos a EUR.'},
+      {rank:1,name:'Shanks',jp:'シャンクス · MANGA',number:'OP01-120',rarity:'SEC · MANGA',image:'https://cdn.snkrdunk.com/apparel_used_listings/03c95d7f-c82a-40f4-ba7e-617fa0a22a9f/809490.jpeg?size=l',raw:883.44,psa:1793.78,note:'Referencia JPN · Manga/Parallel. Importes convertidos a EUR.'}
+    ]
+  },
+  OP13:{
+    label:'OP-13 · CAJA CHN', emoji:'🇨🇳',
+    cards:[
+      {rank:5,name:'Portgas D. Ace',jp:'ポートガス・D・エース',number:'OP13-119',rarity:'SEC · RED MANGA',image:'https://www.magicardshop-op.jp/data/magicardshop-op/product/20251031_689100.jpg',raw:2690.69,psa:4929.53,note:'PriceCharting JPN · Red Manga. Precios en USD convertidos a EUR.'},
+      {rank:4,name:'Sabo',jp:'サボ',number:'OP13-120',rarity:'SEC · RED MANGA',image:'https://omotenashitcg.com/cdn/shop/files/K9250822004.jpg?v=1767121642',raw:2411.30,psa:3953.13,note:'PriceCharting JPN · Red Manga. Precios en USD convertidos a EUR.'},
+      {rank:3,name:'Monkey.D.Luffy',jp:'モンキー・D・ルフィ',number:'OP13-118',rarity:'SEC · MANGA',image:'https://opoman.om/cdn/shop/files/Luffy_Manga_OP13-118F.jpg?v=1765119867&width=1445',raw:1062.33,psa:2987.50,note:'PriceCharting JPN · Manga. Precios en USD convertidos a EUR.'},
+      {rank:2,name:'Portgas.D.Ace',jp:'ポートガス・D・エース',number:'OP13-119',rarity:'SEC · MANGA',image:'https://i.ebayimg.com/images/g/RhgAAeSwr09pFrrX/s-l500.jpg',raw:803.87,psa:1150.00,note:'PriceCharting JPN · Manga. Precios en USD convertidos a EUR.'},
+      {rank:1,name:'Monkey.D.Luffy',jp:'モンキー・D・ルフィ',number:'OP13-118',rarity:'SEC · RED MANGA',image:'https://i.ebayimg.com/images/g/qYMAAeSwP2JpDOOP/s-l1200.jpg',raw:7778.14,psa:11273.08,note:'PriceCharting JPN · Red Manga. Precios en USD convertidos a EUR.'}
+    ]
+  },
+  EB03:{
+    label:'EB-03 · CAJA JPN', emoji:'🇯🇵',
+    cards:[
+      {rank:5,name:'Uta',jp:'ウタ',number:'EB03-003',rarity:'SP · SPECIAL PARALLEL',image:'https://i.ebayimg.com/images/g/ZLMAAeSwt15o~Hqk/s-l1200.png',raw:260.00,psa:492.30,note:'PriceCharting JPN · SP. Precios actuales convertidos a EUR.'},
+      {rank:4,name:'Nico Robin',jp:'ニコ・ロビン',number:'EB03-055',rarity:'SP · SPECIAL PARALLEL',image:'https://i.ebayimg.com/images/g/7SQAAeSw0ilo~GKg/s-l1200.jpg',raw:479.48,psa:878.00,note:'PriceCharting JPN · SP. Precios actuales convertidos a EUR.'},
+      {rank:3,name:'Nami',jp:'ナミ',number:'EB03-053',rarity:'SP · SPECIAL PARALLEL',image:'https://cdn.shopify.com/s/files/1/0779/5385/9822/files/imgi_10_EB-03_Heroines-Edition_10189_EB03-053_Nami_20251024_7748fb.webp?v=1763270831',raw:510.00,psa:760.00,note:'PriceCharting JPN · SP. Precios actuales convertidos a EUR.'},
+      {rank:2,name:'Uta',jp:'ウタ',number:'EB03-061',rarity:'SEC · MANGA / SUPER PARALLEL',image:'https://i.ebayimg.com/images/g/iTEAAeSwwdppMpcy/s-l1600.jpg',raw:575.00,psa:976.00,note:'PriceCharting JPN · Manga/Super Parallel. Precios actuales convertidos a EUR.'},
+      {rank:1,name:'Boa Hancock',jp:'ボア・ハンコック',number:'EB03-026',rarity:'SP · SPECIAL PARALLEL',image:'https://s3-ap-northeast-1.amazonaws.com/jiraffe-magi/prod/images/item/12365620/1.jpg',raw:715.00,psa:1499.95,note:'PriceCharting JPN · SP. Precios actuales convertidos a EUR.'}
+    ]
+  }
+};
+let setId='OP01', index=0, timer;
+const $=x=>document.getElementById(x);
+function eur(v){return v==null?'—':new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(v*USD_EUR)}
+function setButtons(){['OP01','OP13','EB03'].forEach(id=>$('btn'+id).classList.toggle('active',id===setId))}
+function selectSet(id){clearTimeout(timer);setId=id;index=0;setButtons();render()}
+function render(){
+  const s=sets[setId], c=s.cards[index];
+  $('emoji').textContent=s.emoji;$('setName').textContent=s.label;$('rank').textContent=c.rank;$('name').textContent=c.name;$('jp').textContent=c.jp;$('number').textContent=c.number;$('rarity').textContent=c.rarity;$('raw').textContent=eur(c.raw);$('psa').textContent=eur(c.psa);$('note').textContent=c.note;
+  $('fallbackTitle').textContent='Imagen no disponible';$('fallbackNumber').textContent=c.number+' · '+c.name;$('fallback').style.display='none';
+  const box=$('cardbox'), img=$('card');box.className='cardbox';void box.offsetWidth;
+  img.onload=()=>{img.style.display='block';$('fallback').style.display='none';box.classList.add('in')};
+  img.onerror=()=>{img.style.display='none';$('fallback').style.display='flex';box.classList.add('in')};
+  img.src=c.image;start();
+}
+function start(){clearTimeout(timer);$('bar').style.transition='none';$('bar').style.width='0';void $('bar').offsetWidth;$('bar').style.transition=`width ${duration}ms linear`;$('bar').style.width='100%';timer=setTimeout(next,duration)}
+function next(){const b=$('cardbox');b.classList.remove('in');b.classList.add('out');setTimeout(()=>{index=(index+1)%sets[setId].cards.length;render()},420)}
+function prev(){clearTimeout(timer);const b=$('cardbox');b.classList.remove('in');b.classList.add('out');setTimeout(()=>{index=(index-1+sets[setId].cards.length)%sets[setId].cards.length;render()},420)}
+document.addEventListener('keydown',e=>{if(e.key==='1'){selectSet('OP01');return}if(e.key==='2'){selectSet('OP13');return}if(e.key==='3'){selectSet('EB03');return}if(e.code==='ArrowRight'||e.code==='Space'){e.preventDefault();next()}if(e.code==='ArrowLeft'){e.preventDefault();prev()}});
+render();
+</script>
+</body>
+</html>
