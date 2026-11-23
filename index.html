@@ -37,11 +37,12 @@ body{background:transparent}
 </head>
 <body>
 <div class="stage">
-  <div class="header"><span id="emoji">🇨🇳</span><span class="box" id="setName">OP-01 · CAJA CHN</span><span class="prices">· PRECIOS JPN</span></div>
+  <div class="header"><span id="emoji">🇨🇳</span><span class="box" id="setName">OP-01 · CAJA CHN</span><span class="prices" id="setPrices">· PRECIOS JPN</span></div>
   <div class="sets">
     <button id="btnOP01" class="active" onclick="selectSet('OP01')">OP-01</button>
     <button id="btnOP13" onclick="selectSet('OP13')">OP-13</button>
     <button id="btnEB03" onclick="selectSet('EB03')">EB-03</button>
+    <button id="btnOP17" onclick="selectSet('OP17')">OP-17</button>
   </div>
   <div class="rank"><div><small>TOP</small><b id="rank">5</b></div></div>
   <div class="cardbox" id="cardbox">
@@ -52,15 +53,16 @@ body{background:transparent}
   <section class="info">
     <div class="name" id="name"></div>
     <div class="sub" id="jp"></div>
-    <div class="pills"><span class="pill" id="number"></span><span class="pill" id="rarity"></span><span class="pill">🇯🇵 IMAGEN / PRECIO JPN</span></div>
-    <div class="price"><span>🇯🇵 SIN CALIFICAR</span><b id="raw"></b></div>
-    <div class="price psa"><span>🇯🇵 PSA 10</span><b id="psa"></b></div>
+    <div class="pills"><span class="pill" id="number"></span><span class="pill" id="rarity"></span><span class="pill" id="cardSource">🇯🇵 IMAGEN / PRECIO JPN</span></div>
+    <div class="price"><span id="rawLabel">🇯🇵 SIN CALIFICAR</span><b id="raw"></b></div>
+    <div class="price psa"><span id="psaLabel">🇯🇵 PSA 10</span><b id="psa"></b></div>
     <div class="note" id="note"></div>
   </section>
   <div class="progress"><i id="bar"></i></div>
-  <div class="footer">FONDO TRANSPARENTE · OVERLAY VERTICAL PARA OBS · 1 / 2 / 3 CAMBIA DE SET</div>
+  <div class="footer">FONDO TRANSPARENTE · OVERLAY VERTICAL PARA OBS · 1 / 2 / 3 / 4 CAMBIA DE SET</div>
   <div class="buttons"><button onclick="prev()">◀</button><button onclick="next()">▶</button></div>
 </div>
+<script src="./op17-images.js"></script>
 <script>
 const USD_EUR = 0.88202; // 1 USD = 0.88202 EUR, 30/09/2026
 const duration = 6500;
@@ -95,15 +97,28 @@ const sets = {
       {rank:1,name:'Boa Hancock',jp:'ボア・ハンコック',number:'EB03-026',rarity:'SP · SPECIAL PARALLEL',image:'https://s3-ap-northeast-1.amazonaws.com/jiraffe-magi/prod/images/item/12365620/1.jpg',raw:715.00,psa:1499.95,note:'PriceCharting JPN · SP. Precios actuales convertidos a EUR.'}
     ]
   }
+  OP17:{
+    label:"OP-17 · THE WORLD'S STRONGEST WARRIORS · ASIA LEGAL", emoji:'🇯🇵',
+    prices:'· OFERTAS CARDMARKET', source:'🇯🇵 IMÁGENES · CARDMARKET',
+    rawLabel:'OFERTA DESDE · CARDMARKET', psaLabel:'PSA 10 · SIN DATOS',
+    directEUR:true,
+    cards:[
+      {rank:5,name:'Edward.Newgate',jp:'エドワード・ニューゲート',number:'OP17-005 · V.3',rarity:'SR · PARALLEL',image:window.OP17_IMAGES.top5,raw:560,psa:null,note:'Oferta “Desde” de tu captura de Cardmarket. PSA 10: sin cotización verificada.'},
+      {rank:4,name:'Monkey.D.Luffy',jp:'モンキー・D・ルフィ',number:'OP17-079 · V.3',rarity:'L · PARALLEL',image:window.OP17_IMAGES.top4,raw:625,psa:null,note:'Oferta “Desde” de tu captura de Cardmarket. PSA 10: sin cotización verificada.'},
+      {rank:3,name:'Shanks',jp:'シャンクス',number:'OP17-022 · V.3',rarity:'SR · PARALLEL',image:window.OP17_IMAGES.top3,raw:950,psa:null,note:'Oferta “Desde” de tu captura de Cardmarket. PSA 10: sin cotización verificada.'},
+      {rank:2,name:'Rocks.D.Xebec',jp:'ロックス・D・ジーベック',number:'OP17-118 · V.3',rarity:'SEC · PARALLEL',image:window.OP17_IMAGES.top2,raw:2000,psa:null,note:'Oferta “Desde” de tu captura de Cardmarket. PSA 10: sin cotización verificada.'},
+      {rank:1,name:'Monkey.D.Luffy',jp:'モンキー・D・ルフィ',number:'EB04-061',rarity:'SEC · PARALLEL',image:window.OP17_IMAGES.top1,raw:8900,psa:null,note:'Oferta “Desde” de tu captura de Cardmarket. PSA 10: sin cotización verificada.'}
+    ]
+  }
 };
 let setId='OP01', index=0, timer;
 const $=x=>document.getElementById(x);
-function eur(v){return v==null?'—':new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(v*USD_EUR)}
-function setButtons(){['OP01','OP13','EB03'].forEach(id=>$('btn'+id).classList.toggle('active',id===setId))}
+function eur(v,directEUR=false){return v==null?'—':new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(directEUR?v:v*USD_EUR)}
+function setButtons(){['OP01','OP13','EB03','OP17'].forEach(id=>$('btn'+id).classList.toggle('active',id===setId))}
 function selectSet(id){clearTimeout(timer);setId=id;index=0;setButtons();render()}
 function render(){
   const s=sets[setId], c=s.cards[index];
-  $('emoji').textContent=s.emoji;$('setName').textContent=s.label;$('rank').textContent=c.rank;$('name').textContent=c.name;$('jp').textContent=c.jp;$('number').textContent=c.number;$('rarity').textContent=c.rarity;$('raw').textContent=eur(c.raw);$('psa').textContent=eur(c.psa);$('note').textContent=c.note;
+  $('emoji').textContent=s.emoji;$('setName').textContent=s.label;$('setPrices').textContent=s.prices||'· PRECIOS JPN';$('rank').textContent=c.rank;$('name').textContent=c.name;$('jp').textContent=c.jp;$('number').textContent=c.number;$('rarity').textContent=c.rarity;$('cardSource').textContent=s.source||'🇯🇵 IMAGEN / PRECIO JPN';$('rawLabel').textContent=s.rawLabel||'🇯🇵 SIN CALIFICAR';$('psaLabel').textContent=s.psaLabel||'🇯🇵 PSA 10';$('raw').textContent=eur(c.raw,s.directEUR);$('psa').textContent=eur(c.psa,s.directEUR);$('note').textContent=c.note;
   $('fallbackTitle').textContent='Imagen no disponible';$('fallbackNumber').textContent=c.number+' · '+c.name;$('fallback').style.display='none';
   const box=$('cardbox'), img=$('card');box.className='cardbox';void box.offsetWidth;
   img.onload=()=>{img.style.display='block';$('fallback').style.display='none';box.classList.add('in')};
@@ -113,7 +128,7 @@ function render(){
 function start(){clearTimeout(timer);$('bar').style.transition='none';$('bar').style.width='0';void $('bar').offsetWidth;$('bar').style.transition=`width ${duration}ms linear`;$('bar').style.width='100%';timer=setTimeout(next,duration)}
 function next(){const b=$('cardbox');b.classList.remove('in');b.classList.add('out');setTimeout(()=>{index=(index+1)%sets[setId].cards.length;render()},420)}
 function prev(){clearTimeout(timer);const b=$('cardbox');b.classList.remove('in');b.classList.add('out');setTimeout(()=>{index=(index-1+sets[setId].cards.length)%sets[setId].cards.length;render()},420)}
-document.addEventListener('keydown',e=>{if(e.key==='1'){selectSet('OP01');return}if(e.key==='2'){selectSet('OP13');return}if(e.key==='3'){selectSet('EB03');return}if(e.code==='ArrowRight'||e.code==='Space'){e.preventDefault();next()}if(e.code==='ArrowLeft'){e.preventDefault();prev()}});
+document.addEventListener('keydown',e=>{if(e.key==='1'){selectSet('OP01');return}if(e.key==='2'){selectSet('OP13');return}if(e.key==='3'){selectSet('EB03');return}if(e.key==='4'){selectSet('OP17');return}if(e.code==='ArrowRight'||e.code==='Space'){e.preventDefault();next()}if(e.code==='ArrowLeft'){e.preventDefault();prev()}});
 render();
 </script>
 </body>
